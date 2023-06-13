@@ -7,21 +7,11 @@ from main import *
 
 screen_width = root.winfo_screenwidth()
 screen_height = root.winfo_screenheight()
-def tcpSetting(): 
-    
-    port = entry.get()
-    with open("port.txt", "w") as file:
-        file.write(port)
-    
-    
-    ipadres = ipentry.get()
-    with open("ipadres.txt", "w") as file:
-        file.write(ipadres)
-    
-    writee()
+
     
 portFile = ''
 ipadresFile = ''
+
 def writee():
     global portFile,ipadresFile
     with open("port.txt", "r") as file:
@@ -54,7 +44,13 @@ ipLabel.grid(row=1,column=0)
 ipentry = Entry(setting,width=40)
 ipentry.grid(row=1, column=1,)
 
-portbtn = Button(setting,text="KAYDET", command=tcpSetting)
-portbtn.grid(row=2,column=0)
+
 writee()
-print(portFile)
+
+onlilabel = Label(setting,text="adxl345 veri okuma aktifleştir: ")
+onlilabel.grid(row=3,column=0)
+
+onliinput = Entry(setting,width=40)
+onliinput.grid(row=3, column=1,)
+
+
