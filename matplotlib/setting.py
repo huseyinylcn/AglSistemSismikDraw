@@ -54,3 +54,8 @@ onliinput = Entry(setting,width=40)
 onliinput.grid(row=3, column=1,)
 
 
+
+
+
+
+
