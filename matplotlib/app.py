@@ -10,11 +10,28 @@ from ivmeGrafik import *
 from detail import *
 from data import *
 
+
+def onlineSetting():
+    with open("kontrol.txt", "r") as file:
+        sonuc =  file.read()
+    with open("port.txt", "r") as file:
+        port =  file.read()
+    with open("ipadres.txt", "r") as file:
+        ipadres =  file.read()
+        
+    if sonuc == 'true':
+        print('calisti')
+        if port !='' and ipadres != '':
+             print(port)
+             print(ipadres)
+    else:
+        print('nonono')
+
 def two():
    for widget in root.winfo_children():
        widget.pack_forget()
    setting.pack()
-   start_Dgrafik1()
+   grafik_false()
    buttonAll.pack()
   
 def main():
@@ -48,9 +65,63 @@ def detay3():
     
 
 
+onlineIf = False
+def data():
+    while onlineIf:
+        yeni_eleman = np.random.rand()
+        uzun_dizi.append(yeni_eleman)
+        del uzun_dizi[0] 
+        uzun_dizi2.append(yeni_eleman)
+        del uzun_dizi2[0] 
+        uzun_dizi3.append(yeni_eleman)
+        del uzun_dizi3[0] 
+      
+        time.sleep(0.01)
+       
+
+
+def online():
+    global onlineIf
+    with open("kontrol.txt", "r") as file:
+        sonuc =  file.read()
+    onliinput.delete(0, END)  
+    onliinput.insert(0, sonuc)
+    if sonuc == 'true':
+         onlineIf = True
+    else:
+        onlineIf = False
+
+online()
+onlineSetting()
+data_thread = threading.Thread(target=data)
+data_thread.start() 
+
+def onlineSet(): 
     
+    bool = onliinput.get()
+    with open("kontrol.txt", "w") as file:
+        file.write(bool)
+    
+    online()
+    onlineSetting()
+    data_thread = threading.Thread(target=data)
+    data_thread.start() 
+    
+    
+def tcpSetting(): 
+    port = entry.get()
+    with open("port.txt", "w") as file:
+        file.write(port)
 
+    ipadres = ipentry.get()
+    with open("ipadres.txt", "w") as file:
+        file.write(ipadres)
+    writee()
+    onlineSetting()
 
+        
+        
+        
 buttonAll = Frame(root, width=820,height=100,bg="black")
 buttonAll.pack(padx=5,pady=5)
 Button(buttonAll,text="Ayarlar",width=25,height=3,bg="orange",command=two).pack(side=RIGHT, padx=10,pady=5)
@@ -71,22 +142,11 @@ Button(detailFrame2,text="⚽",width=2,height=1,bg="red",command=startbebek2).pl
 Button(detailFrame3,text="⚽",width=2,height=1,bg="red",command=startbebek3).place(x=770,y=10)
 
 
-def data():
-    while True:
-        yeni_eleman = np.random.rand()
-        uzun_dizi.append(yeni_eleman)
-        del uzun_dizi[0] 
-        uzun_dizi2.append(yeni_eleman)
-        del uzun_dizi2[0] 
-        uzun_dizi3.append(yeni_eleman)
-        del uzun_dizi3[0] 
-      
-        time.sleep(0.01)
-       
-data_thread = threading.Thread(target=data)
-data_thread.start()
-   
-   
+portbtn = Button(setting,text="KAYDET", command=tcpSetting)
+portbtn.grid(row=2,column=1)
+onlibtn = Button(setting,text="KAYDET", command=onlineSet)
+onlibtn.grid(row=3,column=2)
+
 root.mainloop() 
 
 
