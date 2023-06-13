@@ -44,10 +44,10 @@ canvas.get_tk_widget().pack()
 
 
 
-grafik_flag = False  # grafik fonksiyonu için bayrak
-Dgrafik1_flag = False  # Dgrafik1 fonksiyonu için bayrak
-Dgrafik2_flag = False  # Dgrafik2 fonksiyonu için bayrak
-Dgrafik3_flag = False  # Dgrafik3 fonksiyonu için bayrak
+grafik_flag = False
+Dgrafik1_flag = False
+Dgrafik2_flag = False
+Dgrafik3_flag = False
 def grafik():
     global grafik_flag
     line.set_data(range(len(uzun_dizi)), uzun_dizi) 
@@ -90,11 +90,12 @@ def Dgrafik3():
 
 def start_grafik():
     global grafik_flag, Dgrafik1_flag, Dgrafik2_flag, Dgrafik3_flag
-    grafik_flag = True
-    Dgrafik1_flag = False
-    Dgrafik2_flag = False
-    Dgrafik3_flag = False
-    grafik()
+    if grafik_flag == False:
+         grafik_flag = True
+         Dgrafik1_flag = False
+         Dgrafik2_flag = False
+         Dgrafik3_flag = False
+         grafik()
 
 def start_Dgrafik1():
     global grafik_flag, Dgrafik1_flag, Dgrafik2_flag, Dgrafik3_flag
@@ -128,7 +129,7 @@ def startbebek():
         Dgrafik1_flag = False
         Dgrafik2_flag = False
         Dgrafik3_flag = False
-        cursor = Cursor(fax, useblit=True, color='red', linewidth=1)
+        
     else:
         grafik_flag = False
         Dgrafik1_flag = True
@@ -169,3 +170,10 @@ def startbebek3():
         Dgrafik3_flag = True
     Dgrafik3()
          
+def grafik_false():
+    global grafik_flag, Dgrafik1_flag, Dgrafik2_flag, Dgrafik3_flag
+    grafik_flag = False
+    Dgrafik1_flag = False
+    Dgrafik2_flag = False
+    Dgrafik3_flag = False
+    
