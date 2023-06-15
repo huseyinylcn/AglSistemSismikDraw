@@ -1,153 +1,65 @@
-
-import numpy as np
-from tkinter import *
+import smbus
 import time
-import threading
 
-from main import *
-from setting import *
-from ivmeGrafik import *
-from detail import *
-from data import *
+# ADXL345 adresi
+DEVICE_ADDRESS = 0x53
 
+# I2C otobüs numarası (Orange Pi PC Plus'ta I2C-1 kullanılır)
+bus = smbus.SMBus(1)
 
-def onlineSetting():
-    with open("kontrol.txt", "r") as file:
-        sonuc =  file.read()
-    with open("port.txt", "r") as file:
-        port =  file.read()
-    with open("ipadres.txt", "r") as file:
-        ipadres =  file.read()
-        
-    if sonuc == 'true':
-        print('calisti')
-        if port !='' and ipadres != '':
-             print(port)
-             print(ipadres)
-    else:
-        print('nonono')
+# ADXL345'e başlatma komutu gönderme
+bus.write_byte_data(DEVICE_ADDRESS, 0x2D, 0x08)
 
-def two():
-   for widget in root.winfo_children():
-       widget.pack_forget()
-   setting.pack()
-   grafik_false()
-   buttonAll.pack()
-  
-def main():
-   for widget in root.winfo_children():
-       widget.pack_forget()
-   box.pack(padx=5,pady=5)
-   buttonAll.pack()
-   start_grafik()
+# ADXL345 veri formatını ayarlama (tam çözünürlük)
+bus.write_byte_data(DEVICE_ADDRESS, 0x31, 0x08)
 
-def detay1():
-    for widget in root.winfo_children():
-       widget.pack_forget()
-    detailFrame.pack()
-    buttonAll.pack()
-    start_Dgrafik1()
-    
-    
-def detay2():
-    for widget in root.winfo_children():
-       widget.pack_forget()
-    detailFrame2.pack()
-    buttonAll.pack()
-    start_Dgrafik2()
+# Ölçek faktörü
+SCALE_FACTOR = 3.9  # 3.9 mg/LSB
 
-def detay3():
-    for widget in root.winfo_children():
-       widget.pack_forget()
-    detailFrame3.pack()
-    buttonAll.pack()
-    start_Dgrafik3() 
-    
+try:
+    while True:
+        # X ekseninden veri okuma
+        x0 = bus.read_byte_data(DEVICE_ADDRESS, 0x32)
+        x1 = bus.read_byte_data(DEVICE_ADDRESS, 0x33)
+        x = (x1 << 8) | x0
+        if x > 0x7FFF:
+            x = x - 0xFFFF
 
+        # Y ekseninden veri okuma
+        y0 = bus.read_byte_data(DEVICE_ADDRESS, 0x34)
+        y1 = bus.read_byte_data(DEVICE_ADDRESS, 0x35)
+        y = (y1 << 8) | y0
+        if y > 0x7FFF:
+            y = y - 0xFFFF
 
-onlineIf = False
-def data():
-    while onlineIf:
-        yeni_eleman = np.random.rand()
-        uzun_dizi.append(yeni_eleman)
-        del uzun_dizi[0] 
-        uzun_dizi2.append(yeni_eleman)
-        del uzun_dizi2[0] 
-        uzun_dizi3.append(yeni_eleman)
-        del uzun_dizi3[0] 
-      
-        time.sleep(0.01)
-       
+        # Z ekseninden veri okuma
+        z0 = bus.read_byte_data(DEVICE_ADDRESS, 0x36)
+        z1 = bus.read_byte_data(DEVICE_ADDRESS, 0x37)
+        z = (z1 << 8) | z0
+        if z > 0x7FFF:
+            z = z - 0xFFFF
 
+        # Ivme hesaplama
+        x_g = x * SCALE_FACTOR
+        y_g = y * SCALE_FACTOR
+        z_g = z * SCALE_FACTOR
 
-def online():
-    global onlineIf
-    with open("kontrol.txt", "r") as file:
-        sonuc =  file.read()
-    onliinput.delete(0, END)  
-    onliinput.insert(0, sonuc)
-    if sonuc == 'true':
-         onlineIf = True
-    else:
-        onlineIf = False
+        # Okunan verileri ekrana yazdırma
+        print("X (g):", x_g)
+        print("Y (g):", y_g)
+        print("Z (g):", z_g)
+        print("---------")
 
-online()
-onlineSetting()
-data_thread = threading.Thread(target=data)
-data_thread.start() 
+        # 0.1 saniye bekleme
+        time.sleep(0.1)
 
-def onlineSet(): 
-    
-    bool = onliinput.get()
-    with open("kontrol.txt", "w") as file:
-        file.write(bool)
-    
-    online()
-    onlineSetting()
-    data_thread = threading.Thread(target=data)
-    data_thread.start() 
-    
-    
-def tcpSetting(): 
-    port = entry.get()
-    with open("port.txt", "w") as file:
-        file.write(port)
+except KeyboardInterrupt:
+    pass
+Bu güncellenmiş kodda, X, Y ve Z eksenlerinden veri okurken eksi değerler doğru bir şekilde işlenir. Okunan verileri hesaplama ve ekrana yazdırma aşamaları da güncellenmiştir.
 
-    ipadres = ipentry.get()
-    with open("ipadres.txt", "w") as file:
-        file.write(ipadres)
-    writee()
-    onlineSetting()
+Dikkat edilmesi gereken bir nokta, ölçek faktörünün değiştiği ve 3.9 mg/LSB olarak güncellendiği noktadır. Bu, ADXL345 ivmeölçer tarafından sağlanan hassasiyeti temsil eder. Ölçek faktörünü kullanarak okunan verileri doğru bir şekilde ivme birimine dönüştürebilirsiniz.
 
-        
-        
-        
-buttonAll = Frame(root, width=820,height=100,bg="black")
-buttonAll.pack(padx=5,pady=5)
-Button(buttonAll,text="Ayarlar",width=25,height=3,bg="orange",command=two).pack(side=RIGHT, padx=10,pady=5)
-Button(buttonAll,text="Detay",width=25,height=3,bg="red").pack(side=RIGHT, padx=10,pady=5)
-Button(buttonAll,text="Detay",width=25,height=3,bg="yellow").pack(side=RIGHT, padx=10,pady=5)
-Button(buttonAll,text="Ana Sayfa",width=25,height=3,bg="tomato",command=main).pack(side=RIGHT, padx=10,pady=5)
-
-
-
-
-Button(box,text="🍳",width=1,height=1,bg="white",command=detay1).place(x=770,y=10)
-Button(box,text="🍳",width=1,height=1,bg="white",command=detay3).place(x=770,y=350)
-Button(box,text="🍳",width=1,height=1,bg="white",command=detay2).place(x=770,y=200)
-
-
-Button(detailFrame,text="⚽",width=2,height=1,bg="red",command=startbebek).place(x=770,y=10)
-Button(detailFrame2,text="⚽",width=2,height=1,bg="red",command=startbebek2).place(x=770,y=10)
-Button(detailFrame3,text="⚽",width=2,height=1,bg="red",command=startbebek3).place(x=770,y=10)
-
-
-portbtn = Button(setting,text="KAYDET", command=tcpSetting)
-portbtn.grid(row=2,column=1)
-onlibtn = Button(setting,text="KAYDET", command=onlineSet)
-onlibtn.grid(row=3,column=2)
-
-root.mainloop() 
+Bu güncellenmiş kodda eksi değerleri doğru bir şekilde işlemleyerek istediğiniz sonuçları elde etmeniz gerektiğini umuyorum.
 
 
 
