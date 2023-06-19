@@ -4,7 +4,7 @@ from matplotlib.widgets import Cursor
 from tkinter import *
 from main import *
 from data import * 
-
+ 
 fig2, fax = plt.subplots(1,1,figsize=(21, 4.9))
 fig3, fax3 = plt.subplots(1,1,figsize=(21, 4.9))
 fig4, fax4 = plt.subplots(1,1,figsize=(21, 4.9))
@@ -14,6 +14,10 @@ fax.set_facecolor('k')
 fig2.patch.set_facecolor('black')
 fig2.subplots_adjust(left=0.1, right=0.9, bottom=0.1, top=0.9, hspace=0)
 
+
+fax.set_title("E-W",color="green",fontsize=20)
+fax3.set_title("G-K",color="blue",fontsize=20)
+fax4.set_title("Z",color="red",fontsize=20)
 
 
 
